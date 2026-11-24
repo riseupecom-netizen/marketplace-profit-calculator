@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Estimate per-order contribution after marketplace selling costs using your own fee inputs.">
+<title>Marketplace Profit Calculator | Rise Up Ecom</title>
+<style>
+:root{color-scheme:light;--ink:#1d2433;--muted:#586174;--line:#d9deea;--accent:#e27816;--soft:#fff7ed;--good:#176b45;--bad:#a93232}*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{max-width:960px;margin:0 auto;padding:32px 18px 56px}header{margin-bottom:22px}h1{font-size:clamp(1.8rem,4vw,2.5rem);line-height:1.15;margin:0 0 10px}p{margin:8px 0;color:var(--muted)}.brand{color:var(--accent);font-weight:700;letter-spacing:.02em}.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 4px 16px #14203a0a}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-weight:650;font-size:.94rem}.field small{color:var(--muted);font-size:.8rem}.field input{width:100%;border:1px solid #bbc3d2;border-radius:8px;padding:11px 12px;font:inherit;color:var(--ink)}.field input:focus{outline:3px solid #e2781633;border-color:var(--accent)}.result{display:flex;flex-direction:column;gap:13px}.metric{border-bottom:1px solid var(--line);padding-bottom:12px}.metric:last-child{border:0;padding:0}.metric span{display:block;color:var(--muted);font-size:.9rem}.metric strong{font-size:1.55rem}.profit.good{color:var(--good)}.profit.bad{color:var(--bad)}.note{background:var(--soft);border-left:4px solid var(--accent);padding:12px 14px;border-radius:7px;margin-top:16px;color:#513718;font-size:.9rem}.links{margin-top:20px;font-size:.92rem}.links a{color:#9b4d04}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}button{font:inherit;border:1px solid var(--line);border-radius:8px;background:#fff;padding:9px 13px;cursor:pointer;color:var(--ink)}button:hover{border-color:var(--accent)}footer{margin-top:22px;font-size:.84rem;color:var(--muted)}@media(max-width:700px){.layout{grid-template-columns:1fr}.fields{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="brand">RISE UP ECOM · SELLER TOOL</div><h1>Marketplace Profit Calculator</h1><p>Estimate what remains from one order after the costs you enter. Use actual marketplace statements and your own current numbers.</p></header>
+<main class="layout">
+<section class="card" aria-labelledby="inputs-title"><h2 id="inputs-title">Order inputs</h2><div class="fields">
+<div class="field"><label for="price">Selling price before discount (₹)</label><input id="price" type="number" min="0" step="0.01" value="1000"><small>Amount paid for the item before discount.</small></div>
+<div class="field"><label for="discount">Discount funded by you (₹)</label><input id="discount" type="number" min="0" step="0.01" value="0"></div>
+<div class="field"><label for="product">Product cost (₹)</label><input id="product" type="number" min="0" step="0.01" value="400"></div>
+<div class="field"><label for="packaging">Packaging (₹)</label><input id="packaging" type="number" min="0" step="0.01" value="20"></div>
+<div class="field"><label for="fulfilment">Shipping / fulfilment (₹)</label><input id="fulfilment" type="number" min="0" step="0.01" value="70"></div>
+<div class="field"><label for="fees">Marketplace fees (₹)</label><input id="fees" type="number" min="0" step="0.01" value="100"><small>Enter the fee amount from your current estimate or statement.</small></div>
+<div class="field"><label for="ads">Advertising allocated to this order (₹)</label><input id="ads" type="number" min="0" step="0.01" value="50"></div>
+<div class="field"><label for="returns">Expected return / damage allowance (₹)</label><input id="returns" type="number" min="0" step="0.01" value="20"></div>
+<div class="field"><label for="other">Other variable costs (₹)</label><input id="other" type="number" min="0" step="0.01" value="0"></div>
+</div><div class="actions"><button type="button" id="reset">Reset example</button></div></section>
+<aside class="card result" aria-live="polite" aria-label="Calculation results">
+<div class="metric"><span>Net sales after discount</span><strong id="net">₹0.00</strong></div>
+<div class="metric"><span>Total entered costs</span><strong id="costs">₹0.00</strong></div>
+<div class="metric"><span>Estimated contribution per order</span><strong id="profit" class="profit">₹0.00</strong></div>
+<div class="metric"><span>Contribution margin on net sales</span><strong id="margin">0.0%</strong></div>
+<div class="note">This is an estimate, not a marketplace fee quote or accounting record. Fee rates, taxes, shipping charges and return costs vary by category, program and order. Enter the current amounts that apply to you.</div>
+<div class="links">For a worked-through worksheet outline, see the <a href="https://riseupecomsellerguides.blogspot.com/2026/11/how-to-build-practical-marketplace.html" target="_blank" rel="noopener">marketplace profit worksheet guide</a>. Learn more about <a href="https://riseupecom.in/" target="_blank" rel="noopener">Rise Up Ecom</a>.</div>
+</aside>
+</main>
+<footer>Calculations run in your browser. Values are not uploaded or saved. Check all figures against your marketplace statement before making business decisions.</footer>
+</div>
+<script>
+const ids=['price','discount','product','packaging','fulfilment','fees','ads','returns','other'];
+const money=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2});
+function value(id){const n=Number(document.getElementById(id).value);return Number.isFinite(n)&&n>0?n:0}
+function calculate(){const net=Math.max(0,value('price')-value('discount'));const costs=ids.slice(2).reduce((sum,id)=>sum+value(id),0);const profit=net-costs;document.getElementById('net').textContent=money.format(net);document.getElementById('costs').textContent=money.format(costs);const out=document.getElementById('profit');out.textContent=money.format(profit);out.className='profit '+(profit>=0?'good':'bad');document.getElementById('margin').textContent=(net?((profit/net)*100):0).toFixed(1)+'%'}
+ids.forEach(id=>document.getElementById(id).addEventListener('input',calculate));
+document.getElementById('reset').addEventListener('click',()=>{const defaults={price:1000,discount:0,product:400,packaging:20,fulfilment:70,fees:100,ads:50,returns:20,other:0};Object.entries(defaults).forEach(([id,n])=>document.getElementById(id).value=n);calculate()});calculate();
+</script>
+</body>
+</html>
